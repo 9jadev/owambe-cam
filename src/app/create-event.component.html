@@ -1,0 +1,149 @@
+<div
+    class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50 flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-2xl">
+        <!-- Header -->
+        <div class="text-center mb-8 animate-fade-in-up">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 shadow-premium-lg mb-6">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Create New Event</h1>
+            <p class="text-gray-600">Set up your event to start collecting photos and videos</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="rounded-2xl bg-white border border-gray-200 shadow-premium-lg p-6 md:p-8 animate-fade-in-up">
+            <form [formGroup]="eventForm" (ngSubmit)="createEvent()">
+                <!-- Event Name -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-900 mb-2">
+                        Event Name <span class="text-brand-600">*</span>
+                    </label>
+                    <input type="text" formControlName="name"
+                        class="w-full px-4 py-3 rounded-xl border transition-all focus:outline-none focus:ring-2"
+                        [class.border-gray-300]="!eventForm.get('name')?.touched || !eventForm.get('name')?.errors"
+                        [class.focus-ring-brand]="!eventForm.get('name')?.touched || !eventForm.get('name')?.errors"
+                        [class.border-red-300]="eventForm.get('name')?.touched && eventForm.get('name')?.errors"
+                        [class.focus-ring-red]="eventForm.get('name')?.touched && eventForm.get('name')?.errors"
+                        placeholder="e.g., Tech Conference 2025" />
+                    <p *ngIf="eventForm.get('name')?.touched && eventForm.get('name')?.hasError('required')"
+                        class="mt-2 text-sm text-red-600">
+                        Event name is required
+                    </p>
+                    <p *ngIf="eventForm.get('name')?.touched && eventForm.get('name')?.hasError('minlength')"
+                        class="mt-2 text-sm text-red-600">
+                        Event name must be at least 2 characters
+                    </p>
+                </div>
+
+                <!-- Event Date -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-900 mb-2">
+                        Event Date <span class="text-brand-600">*</span>
+                    </label>
+                    <input type="date" formControlName="date"
+                        class="w-full px-4 py-3 rounded-xl border transition-all focus:outline-none focus:ring-2"
+                        [class.border-gray-300]="!eventForm.get('date')?.touched || !eventForm.get('date')?.errors"
+                        [class.focus-ring-brand]="!eventForm.get('date')?.touched || !eventForm.get('date')?.errors"
+                        [class.border-red-300]="eventForm.get('date')?.touched && eventForm.get('date')?.errors"
+                        [class.focus-ring-red]="eventForm.get('date')?.touched && eventForm.get('date')?.errors" />
+                    <p *ngIf="eventForm.get('date')?.touched && eventForm.get('date')?.hasError('required')"
+                        class="mt-2 text-sm text-red-600">
+                        Event date is required
+                    </p>
+                </div>
+
+                <!-- Event Type -->
+                <div class="mb-8">
+                    <label class="block text-sm font-bold text-gray-900 mb-3">
+                        Event Type <span class="text-brand-600">*</span>
+                    </label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <button type="button" (click)="setEventType('wedding')"
+                            class="px-4 py-3 rounded-xl border-2 transition-all font-medium text-center"
+                            [class.border-brand-600]="selectedEventType === 'wedding'"
+                            [class.bg-brand-50]="selectedEventType === 'wedding'"
+                            [class.text-brand-700]="selectedEventType === 'wedding'"
+                            [class.border-gray-300]="selectedEventType !== 'wedding'"
+                            [class.bg-white]="selectedEventType !== 'wedding'"
+                            [class.text-gray-700]="selectedEventType !== 'wedding'"
+                            [class.hover:border-gray-400]="selectedEventType !== 'wedding'">
+                            <div class="text-2xl mb-1">💍</div>
+                            <div class="text-sm">Wedding</div>
+                        </button>
+                        <button type="button" (click)="setEventType('party')"
+                            class="px-4 py-3 rounded-xl border-2 transition-all font-medium text-center"
+                            [class.border-brand-600]="selectedEventType === 'party'"
+                            [class.bg-brand-50]="selectedEventType === 'party'"
+                            [class.text-brand-700]="selectedEventType === 'party'"
+                            [class.border-gray-300]="selectedEventType !== 'party'"
+                            [class.bg-white]="selectedEventType !== 'party'"
+                            [class.text-gray-700]="selectedEventType !== 'party'"
+                            [class.hover:border-gray-400]="selectedEventType !== 'party'">
+                            <div class="text-2xl mb-1">🎉</div>
+                            <div class="text-sm">Party</div>
+                        </button>
+                        <button type="button" (click)="setEventType('conference')"
+                            class="px-4 py-3 rounded-xl border-2 transition-all font-medium text-center"
+                            [class.border-brand-600]="selectedEventType === 'conference'"
+                            [class.bg-brand-50]="selectedEventType === 'conference'"
+                            [class.text-brand-700]="selectedEventType === 'conference'"
+                            [class.border-gray-300]="selectedEventType !== 'conference'"
+                            [class.bg-white]="selectedEventType !== 'conference'"
+                            [class.text-gray-700]="selectedEventType !== 'conference'"
+                            [class.hover:border-gray-400]="selectedEventType !== 'conference'">
+                            <div class="text-2xl mb-1">🎤</div>
+                            <div class="text-sm">Conference</div>
+                        </button>
+                        <button type="button" (click)="setEventType('birthday')"
+                            class="px-4 py-3 rounded-xl border-2 transition-all font-medium text-center"
+                            [class.border-brand-600]="selectedEventType === 'birthday'"
+                            [class.bg-brand-50]="selectedEventType === 'birthday'"
+                            [class.text-brand-700]="selectedEventType === 'birthday'"
+                            [class.border-gray-300]="selectedEventType !== 'birthday'"
+                            [class.bg-white]="selectedEventType !== 'birthday'"
+                            [class.text-gray-700]="selectedEventType !== 'birthday'"
+                            [class.hover:border-gray-400]="selectedEventType !== 'birthday'">
+                            <div class="text-2xl mb-1">🎂</div>
+                            <div class="text-sm">Birthday</div>
+                        </button>
+                        <button type="button" (click)="setEventType('other')"
+                            class="px-4 py-3 rounded-xl border-2 transition-all font-medium text-center"
+                            [class.border-brand-600]="selectedEventType === 'other'"
+                            [class.bg-brand-50]="selectedEventType === 'other'"
+                            [class.text-brand-700]="selectedEventType === 'other'"
+                            [class.border-gray-300]="selectedEventType !== 'other'"
+                            [class.bg-white]="selectedEventType !== 'other'"
+                            [class.text-gray-700]="selectedEventType !== 'other'"
+                            [class.hover:border-gray-400]="selectedEventType !== 'other'">
+                            <div class="text-2xl mb-1">✨</div>
+                            <div class="text-sm">Other</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button type="button" (click)="cancel()"
+                        class="flex-1 px-6 py-3 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold shadow-premium hover:shadow-premium-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        [disabled]="eventForm.invalid">
+                        Create Event
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Back Link -->
+        <div class="text-center mt-6">
+            <a routerLink="/dashboard" class="text-sm text-gray-600 hover:text-brand-700 transition-colors">
+                ← Back to My Events
+            </a>
+        </div>
+    </div>
+</div>

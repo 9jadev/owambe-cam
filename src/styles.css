@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@source "./src/**/*.{html,ts}";
+
+/* Global styles can go below. Keep minimal to let Tailwind cascade. */
+
+@theme {
+  /* Brand color palette centered on #FD0A90 */
+  --color-brand-50:  #fff1f8;
+  --color-brand-100: #ffe6f3;
+  --color-brand-200: #ffcbe7;
+  --color-brand-300: #ffa2d8;
+  --color-brand-400: #ff6fc2;
+  --color-brand-500: #fe3fb2;
+  --color-brand-600: #fd0a90; /* primary */
+  --color-brand-700: #d50878;
+  --color-brand-800: #a70660;
+  --color-brand-900: #7c0549;
+  --color-brand-950: #4f0331;
+}

@@ -1,1 +1,138 @@
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
 /* You can add global styles to this file, and also import other style files */
+
+:root {
+  /* Brand color palette (Tailwind pink default). Update these to sync brand color. */
+  --brand-50: #fdf2f8;
+  --brand-100: #fce7f3;
+  --brand-200: #fbcfe8;
+  --brand-300: #f9a8d4;
+  --brand-400: #f472b6;
+  --brand-500: #ec4899;
+  --brand-600: #db2777;
+  --brand-700: #be185d;
+  --brand-800: #9d174d;
+  --brand-900: #831843;
+  --brand-950: #500724;
+}
+
+@theme {
+  /* Tailwind v4 theme tokens: brand palette centered on #FD0A90 */
+  --color-brand-50: #fff1f8;
+  --color-brand-100: #ffe6f3;
+  --color-brand-200: #ffcbe7;
+  --color-brand-300: #ffa2d8;
+  --color-brand-400: #ff6fc2;
+  --color-brand-500: #fe3fb2;
+  --color-brand-600: #fd0a90;
+  /* primary */
+  --color-brand-700: #d50878;
+  --color-brand-800: #a70660;
+  --color-brand-900: #7c0549;
+  --color-brand-950: #4f0331;
+}
+
+/* Premium Banking Aesthetic - Global Enhancements */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  @apply text-gray-900;
+  font-feature-settings: 'cv11', 'ss01';
+  letter-spacing: -0.011em;
+}
+
+/* Smooth Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-soft {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.5s ease-out;
+}
+
+/* Premium Glass Effect */
+.glass-effect {
+  @apply backdrop-blur-xl bg-white/80 border border-white/20;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+/* Premium Shadow Styles */
+.shadow-premium {
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-premium-lg {
+  box-shadow: 0 12px 40px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Button Enhancements */
+button,
+a[class*="px-"] {
+  @apply transition-all duration-200 ease-out;
+}
+
+button:active {
+  @apply scale-95;
+}
+
+/* Input Focus Enhancement */
+input:focus,
+textarea:focus,
+select:focus {
+  @apply transition-all duration-200;
+}

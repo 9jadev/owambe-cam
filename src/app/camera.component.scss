@@ -1,0 +1,16 @@
+.controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+video {
+  background: black;
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}

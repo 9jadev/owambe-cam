@@ -1,0 +1,122 @@
+<div class="fixed inset-0 z-40 bg-gradient-to-br from-black via-gray-900 to-black">
+  <div class="max-w-5xl mx-auto px-4 py-4 safe-top">
+    <div
+      class="flex items-center justify-between backdrop-blur-md bg-white/10 rounded-2xl px-5 py-3 border border-white/10">
+      <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">Advanced Mobile Camera</h2>
+      <a class="px-4 py-2 rounded-xl bg-white text-gray-900 hover:bg-gray-100 font-medium shadow-premium transition-all hover:scale-105"
+        routerLink="/">Close</a>
+    </div>
+
+    <!-- Settings collapsible for mobile -->
+    <details class="md:hidden mt-4 rounded-2xl bg-white/10 backdrop-blur-md p-4 border border-white/10">
+      <summary class="cursor-pointer font-semibold text-white">Settings</summary>
+      <div class="mt-4 space-y-4">
+        <div>
+          <div class="text-sm text-white/80 font-medium mb-3">Resolution</div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              class="px-4 py-2.5 rounded-xl bg-gray-700/80 hover:bg-gray-600 text-white font-medium border border-white/10 transition-all"
+              (click)="setResolution('720p')">720p</button>
+            <button
+              class="px-4 py-2.5 rounded-xl bg-gray-700/80 hover:bg-gray-600 text-white font-medium border border-white/10 transition-all"
+              (click)="setResolution('1080p')">1080p</button>
+            <button
+              class="px-4 py-2.5 rounded-xl bg-gray-700/80 hover:bg-gray-600 text-white font-medium border border-white/10 transition-all"
+              (click)="setResolution('4k')">4K</button>
+          </div>
+        </div>
+        <div>
+          <div class="text-sm text-white/80 font-medium mb-3">Enhancements</div>
+          <label class="flex items-center gap-3 text-white mb-2">
+            <input type="checkbox" [(ngModel)]="enhanceEnabled" class="w-4 h-4 rounded" />
+            <span>Enhance (contrast, saturation, brightness)</span>
+          </label>
+          <label class="flex items-center gap-3 text-white">
+            <input type="checkbox" [(ngModel)]="sharpenEnabled" class="w-4 h-4 rounded" />
+            <span>Sharpen (experimental)</span>
+          </label>
+        </div>
+      </div>
+    </details>
+
+    <div class="mt-5 grid md:grid-cols-3 gap-5">
+      <div class="md:col-span-2 space-y-4">
+        <div class="relative rounded-2xl overflow-hidden bg-black shadow-premium-lg border border-white/10">
+          <video #videoEl class="w-full h-[65vh] sm:h-[70vh] md:h-[60vh] object-cover" autoplay playsinline muted
+            [style.filter]="filterCss" [style.transform]="facingMode === 'user' ? 'scaleX(-1)' : 'none'"></video>
+          <canvas #canvasEl class="hidden"></canvas>
+        </div>
+
+        <!-- Desktop controls -->
+        <div class="hidden md:flex flex-wrap items-center gap-3">
+          <button
+            class="px-5 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold shadow-premium hover:shadow-premium-lg hover:scale-105 transition-all"
+            (click)="capturePhoto()">Snap Photo</button>
+          <button
+            class="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold shadow-premium hover:shadow-premium-lg hover:scale-105 transition-all"
+            *ngIf="!isRecording" (click)="startRecording()">Start Video</button>
+          <button
+            class="px-5 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 text-white font-semibold shadow-premium hover:shadow-premium-lg hover:scale-105 transition-all"
+            *ngIf="isRecording" (click)="stopRecording()">Stop Video</button>
+          <button
+            class="px-5 py-3 rounded-xl bg-gray-700/80 hover:bg-gray-600 text-white font-medium border border-white/10 transition-all"
+            (click)="switchCamera()">Switch Camera</button>
+        </div>
+
+        <div class="text-sm text-red-300 font-medium" *ngIf="permissionError">{{ permissionError }}</div>
+        <div class="text-sm text-brand-200 font-medium" *ngIf="infoMessage">{{ infoMessage }}</div>
+      </div>
+
+      <!-- Right sidebar visible on md+ -->
+      <div class="space-y-5 hidden md:block">
+        <div class="rounded-2xl bg-white/10 backdrop-blur-md p-5 border border-white/10">
+          <div class="font-semibold text-white mb-3">Resolution</div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              class="px-4 py-2.5 rounded-xl bg-gray-700/80 hover:bg-gray-600 text-white font-medium border border-white/10 transition-all"
+              (click)="setResolution('720p')">720p</button>
+            <button
+              class="px-4 py-2.5 rounded-xl bg-gray-700/80 hover:bg-gray-600 text-white font-medium border border-white/10 transition-all"
+              (click)="setResolution('1080p')">1080p</button>
+            <button
+              class="px-4 py-2.5 rounded-xl bg-gray-700/80 hover:bg-gray-600 text-white font-medium border border-white/10 transition-all"
+              (click)="setResolution('4k')">4K</button>
+          </div>
+        </div>
+
+        <div class="rounded-2xl bg-white/10 backdrop-blur-md p-5 border border-white/10 space-y-3">
+          <div class="font-semibold text-white">Enhancement Effects</div>
+          <label class="flex items-center gap-3 text-white">
+            <input type="checkbox" [(ngModel)]="enhanceEnabled" class="w-4 h-4 rounded" />
+            <span class="text-sm">Enhance (contrast, saturation, brightness)</span>
+          </label>
+          <label class="flex items-center gap-3 text-white">
+            <input type="checkbox" [(ngModel)]="sharpenEnabled" class="w-4 h-4 rounded" />
+            <span class="text-sm">Sharpen (experimental, may impact performance)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile bottom controls -->
+  <div
+    class="md:hidden fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl safe-bottom border-t border-white/10">
+    <div class="px-4 py-4 grid grid-cols-3 gap-3">
+      <button
+        class="px-3 py-3.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold shadow-premium active:scale-95 transition-all"
+        (click)="capturePhoto()">Snap</button>
+      <button
+        class="px-3 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold shadow-premium active:scale-95 transition-all"
+        *ngIf="!isRecording" (click)="startRecording()">Record</button>
+      <button
+        class="px-3 py-3.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 text-white font-semibold shadow-premium active:scale-95 transition-all"
+        *ngIf="isRecording" (click)="stopRecording()">Stop</button>
+    </div>
+    <div class="px-4 pb-4">
+      <button
+        class="px-3 py-3 rounded-xl bg-gray-700/80 hover:bg-gray-600 text-white font-medium border border-white/10 w-full transition-all"
+        (click)="switchCamera()">Switch Camera</button>
+    </div>
+  </div>
+</div>
