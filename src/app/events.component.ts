@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { AuthHttpService } from './auth-http.service';
 
 interface EventItem {
     id: string;
@@ -25,7 +26,16 @@ export class EventsComponent {
 
     sidebarCollapsed = false;
 
-    constructor(private router: Router) { }
+    constructor(private router: Router, private apiAuth: AuthHttpService) { }
+
+    ngOnInit() {
+        const stored = this.apiAuth.getStoredCustomer();
+        if (stored) this.user = stored as any;
+        this.apiAuth.getMe().subscribe({
+            next: (customer) => (this.user = customer as any),
+            error: () => {}
+        });
+    }
 
     // Events list
     events: EventItem[] = [

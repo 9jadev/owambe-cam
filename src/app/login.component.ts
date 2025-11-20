@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from './auth.service';
+import { AuthHttpService } from './auth-http.service';
 
 @Component({
   standalone: true,
@@ -12,7 +13,7 @@ import { AuthService } from './auth.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) { }
+  constructor(private fb: FormBuilder, private auth: AuthService, private apiAuth: AuthHttpService, private router: Router) { }
 
   @ViewChild('googleBtn', { static: true }) googleBtn!: ElementRef<HTMLDivElement>;
 
@@ -36,7 +37,10 @@ export class LoginComponent {
 
   submit() {
     if (this.form.invalid) return;
-    // Stub: Log in and navigate to dashboard
-    this.router.navigateByUrl('/dashboard');
+    const { email, password } = this.form.value;
+    this.apiAuth.login({ email, password }).subscribe({
+      next: () => this.router.navigateByUrl('/dashboard')
+      // Errors are handled by the auth interceptor + toast
+    });
   }
 }

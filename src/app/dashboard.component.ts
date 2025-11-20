@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthHttpService } from './auth-http.service';
 
 @Component({
     standalone: true,
@@ -18,10 +19,22 @@ export class DashboardComponent {
     };
 
     user = {
-        email: 'user@example.com'
+        email: 'user@example.com',
+        name: 'My Account'
     };
 
     sidebarCollapsed = false;
+
+    constructor(private apiAuth: AuthHttpService) {}
+
+    ngOnInit() {
+        const stored = this.apiAuth.getStoredCustomer();
+        if (stored) this.user = stored as any;
+        this.apiAuth.getMe().subscribe({
+            next: (customer) => (this.user = customer as any),
+            error: () => {}
+        });
+    }
 
     toggleSidebar() {
         this.sidebarCollapsed = !this.sidebarCollapsed;

@@ -1,0 +1,14 @@
+<div class="fixed top-4 right-4 z-[1000] space-y-2 w-80">
+  <div *ngFor="let t of toasts" class="rounded-xl shadow-premium p-3 flex items-start gap-3"
+       [class.bg-emerald-50]="t.type === 'success'"
+       [class.bg-red-50]="t.type === 'error'"
+       [class.bg-blue-50]="t.type === 'info'">
+    <div class="mt-0.5">
+      <span *ngIf="t.type === 'success'" class="inline-block w-2.5 h-2.5 bg-emerald-500 rounded-full"></span>
+      <span *ngIf="t.type === 'error'" class="inline-block w-2.5 h-2.5 bg-red-500 rounded-full"></span>
+      <span *ngIf="t.type === 'info'" class="inline-block w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
+    </div>
+    <div class="text-sm text-gray-800 flex-1">{{ t.text }}</div>
+    <button class="text-xs text-gray-500 hover:text-gray-700" (click)="dismiss(t.id)">Dismiss</button>
+  </div>
+</div>
