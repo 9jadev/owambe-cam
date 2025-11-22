@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map } from 'rxjs';
 import { ToastService } from './toast.service';
-import { environment } from '../environments/environment';
+import { BackendService } from './backend.service';
 
 export interface SignupPayload {
   name: string;
@@ -36,18 +36,15 @@ export interface MeResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthHttpService {
-  constructor(private http: HttpClient, private toast: ToastService) {}
-  private apiBaseUrl = environment.apiBaseUrl;
-  private customerUrl = `${this.apiBaseUrl}/customer`;
+  constructor(private http: HttpClient, private toast: ToastService, private backend: BackendService) {}
+  private customerPath = `/customer`;
   private tokenKey = 'auth.token';
   private expiresKey = 'auth.expiresAt';
   private userKey = 'auth.customer';
 
   signup(payload: SignupPayload): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${this.customerUrl}/signup`, payload, {
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      })
+    return this.backend
+      .post<AuthResponse>(`${this.customerPath}/signup`, payload, this.backend.jsonOptions())
       .pipe(
         tap((res: AuthResponse) => {
           this.setToken(res.token, res.expires_in);
@@ -58,10 +55,8 @@ export class AuthHttpService {
   }
 
   login(payload: LoginPayload): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${this.customerUrl}/login`, payload, {
-        headers: { 'Content-Type': 'application/json' },
-      })
+    return this.backend
+      .post<AuthResponse>(`${this.customerPath}/login`, payload, this.backend.jsonOptions())
       .pipe(
         tap((res: AuthResponse) => {
           this.setToken(res.token, res.expires_in);
@@ -72,7 +67,7 @@ export class AuthHttpService {
 
   refreshToken(): Observable<AuthResponse> {
     // Assumes backend provides refresh endpoint. Adjust path if different.
-    return this.http.post<AuthResponse>(`${this.customerUrl}/refresh`, {}).pipe(
+    return this.backend.post<AuthResponse>(`${this.customerPath}/refresh`, {}).pipe(
       tap((res: AuthResponse) => {
         this.setToken(res.token, res.expires_in);
         this.toast.info('Session refreshed');
@@ -82,7 +77,7 @@ export class AuthHttpService {
 
   // Fetch current authenticated customer profile
   getMe(): Observable<Customer> {
-    return this.http.get<MeResponse>(`${this.customerUrl}/me`).pipe(
+    return this.backend.get<MeResponse>(`${this.customerPath}/me`).pipe(
       map((res: MeResponse) => res.customer),
       tap((customer: Customer) => {
         localStorage.setItem(this.userKey, JSON.stringify(customer));
@@ -92,7 +87,8 @@ export class AuthHttpService {
   }
 
   getWithToken<T>(url: string): Observable<T> {
-    return this.http.get<T>(url);
+    // Accept absolute URLs too
+    return this.backend.get<T>(url);
   }
 
   getToken(): string | null {

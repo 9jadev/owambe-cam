@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { EventsHttpService } from './services/events-http.service';
 
 type EventType = 'wedding' | 'party' | 'conference' | 'birthday' | 'other';
 
@@ -18,7 +19,8 @@ export class CreateEventComponent {
 
     constructor(
         private fb: FormBuilder,
-        private router: Router
+        private router: Router,
+        private eventsApi: EventsHttpService
     ) {
         this.eventForm = this.fb.group({
             name: ['', [Validators.required, Validators.minLength(2)]],
@@ -40,12 +42,18 @@ export class CreateEventComponent {
             return;
         }
 
-        const eventData = this.eventForm.value;
-        console.log('Creating event:', eventData);
+        const { name, date, type } = this.eventForm.value as { name: string; date: string; type: string };
+        const payload = { name, date, type };
 
-        // Stub: Save to backend
-        // After successful creation, navigate to the new event
-        this.router.navigateByUrl('/dashboard/event');
+        this.eventsApi.createEvent(payload).subscribe({
+            next: (res) => {
+                // Navigate to dashboard or the created event route if provided
+                this.router.navigateByUrl('/dashboard');
+            },
+            error: () => {
+                // Errors are handled by interceptor and toast; keep user on form
+            }
+        });
     }
 
     cancel() {

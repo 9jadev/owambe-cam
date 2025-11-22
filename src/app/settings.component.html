@@ -333,25 +333,226 @@
 
                 <!-- Appearance Tab -->
                 <div *ngIf="activeTab === 'appearance'" class="max-w-3xl space-y-8 animate-fade-in">
+                    <!-- Event Logo -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">Event Logo</label>
+                        <p class="text-sm text-gray-600">Brand your event with a square logo (1:1).</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-20 h-20 rounded-xl border border-gray-300 bg-white flex items-center justify-center overflow-hidden">
+                                <img *ngIf="logoImage" [src]="logoImage" alt="Logo" class="w-full h-full object-cover" />
+                                <span *ngIf="!logoImage" class="text-xs text-gray-500">No logo</span>
+                            </div>
+                            <button (click)="uploadLogo()" class="px-5 py-2.5 rounded-xl bg-gray-800 text-white font-semibold hover:bg-gray-700 transition-all">Upload</button>
+                        </div>
+                    </div>
+
+                    <!-- Display Language -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">Display Language</label>
+                        <p class="text-sm text-gray-600">Localize the experience according to your audience.</p>
+                        <select [(ngModel)]="displayLanguage" class="px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-48">
+                            <option value="en">English</option>
+                            <option value="yo">Yorùbá</option>
+                            <option value="fr">Français</option>
+                        </select>
+                    </div>
+
+                    <!-- Theme Color -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">Theme Color</label>
+                        <p class="text-sm text-gray-600">Choose a theme color used across public pages.</p>
+                        <div class="flex items-center gap-3">
+                            <input type="color" [(ngModel)]="primaryColor" class="w-12 h-12 rounded-md border border-gray-300" />
+                            <input type="text" [(ngModel)]="primaryColor" class="px-4 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 w-36" />
+                        </div>
+                    </div>
+
+                    <!-- Welcome Screen -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">Welcome Screen</label>
+                        <p class="text-sm text-gray-600">Show an intro screen for guests on first visit.</p>
+                        <button (click)="toggleWelcomeScreen()" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-all">
+                            {{ welcomeScreenEnabled ? 'Edit Welcome Screen' : 'Add Welcome Screen' }}
+                        </button>
+                    </div>
+
+                    <!-- Remove Branding (Pro) -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">Remove Owambe Branding
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">Pro</span>
+                        </label>
+                        <p class="text-sm text-gray-600">Remove branding and ads from all pages.</p>
+                        <div class="flex items-center gap-3">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" [(ngModel)]="removeBranding" class="sr-only peer" />
+                                <div class="w-12 h-6 bg-gray-200 rounded-full peer peer-checked:bg-brand-600 transition-all relative">
+                                    <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-all peer-checked:left-6"></div>
+                                </div>
+                            </label>
+                            <button class="px-4 py-2 rounded-xl border border-brand-600 text-brand-700 font-semibold" (click)="upgradeToPro()">Upgrade</button>
+                        </div>
+                    </div>
+
+                    <!-- Album Background -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">Album Background</label>
+                        <p class="text-sm text-gray-600">Choose a custom background or rotate through uploaded photos.</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-36 h-20 rounded-xl border border-gray-300 bg-white flex items-center justify-center overflow-hidden">
+                                <img *ngIf="coverImage" [src]="coverImage" alt="Background" class="w-full h-full object-cover" />
+                                <span *ngIf="!coverImage" class="text-xs text-gray-500">No background</span>
+                            </div>
+                            <button (click)="uploadCoverImage()" class="px-5 py-2.5 rounded-xl bg-gray-800 text-white font-semibold hover:bg-gray-700 transition-all">Change</button>
+                        </div>
+                    </div>
+
+                    <!-- Save -->
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">Customize Your Event's Look</h3>
-                        <p class="text-sm text-gray-600">Coming soon...</p>
+                        <button (click)="saveAppearance()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold hover:from-gray-600 hover:to-gray-700 transition-all">
+                            Save Appearance
+                        </button>
                     </div>
                 </div>
 
                 <!-- Photo Wall Tab -->
                 <div *ngIf="activeTab === 'photo-wall'" class="max-w-3xl space-y-8 animate-fade-in">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">Photo Wall Settings</h3>
-                        <p class="text-sm text-gray-600">Coming soon...</p>
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Photo Wall</h3>
+                        <p class="text-sm text-gray-600">Control media duration, background, and visibility options.</p>
+                    </div>
+
+                    <!-- Media Duration -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <label class="block text-sm font-bold text-gray-900">Image Duration</label>
+                            <p class="text-sm text-gray-600">Adjust how long an image is displayed.</p>
+                            <div class="flex items-center gap-3">
+                                <input type="number" min="1" [(ngModel)]="imageDuration" class="w-20 px-3 py-2 rounded-xl border border-gray-300" />
+                                <span class="text-sm text-gray-600">seconds</span>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-sm font-bold text-gray-900">Video Duration</label>
+                            <p class="text-sm text-gray-600">Adjust how long a video is displayed.</p>
+                            <div class="flex items-center gap-3">
+                                <input type="number" min="1" [(ngModel)]="videoDuration" class="w-20 px-3 py-2 rounded-xl border border-gray-300" />
+                                <span class="text-sm text-gray-600">seconds</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">Background</label>
+                        <p class="text-sm text-gray-600">Customize the background.</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-36 h-20 rounded-xl border border-gray-300 bg-white flex items-center justify-center overflow-hidden">
+                                <img *ngIf="wallBackground" [src]="wallBackground" alt="Background" class="w-full h-full object-cover" />
+                                <span *ngIf="!wallBackground" class="text-xs text-gray-500">None</span>
+                            </div>
+                            <button (click)="uploadPhotoWallBackground()" class="px-5 py-2.5 rounded-xl bg-gray-800 text-white font-semibold hover:bg-gray-700 transition-all">Upload</button>
+                        </div>
+                    </div>
+
+                    <!-- Toggles -->
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-900">Hide Side Images</label>
+                            <p class="text-sm text-gray-600">Turn on to hide moving images from the sides.</p>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" [(ngModel)]="hideSideImages" class="sr-only peer" />
+                                <div class="w-12 h-6 bg-gray-200 rounded-full peer peer-checked:bg-brand-600 transition-all relative">
+                                    <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-all peer-checked:left-6"></div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-900">Hide QR Code</label>
+                            <p class="text-sm text-gray-600">Turn on to remove the QR code.</p>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" [(ngModel)]="hideQrCode" class="sr-only peer" />
+                                <div class="w-12 h-6 bg-gray-200 rounded-full peer peer-checked:bg-brand-600 transition-all relative">
+                                    <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-all peer-checked:left-6"></div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-900">Hide Caption</label>
+                            <p class="text-sm text-gray-600">Toggle this option to hide media captions.</p>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" [(ngModel)]="hideCaption" class="sr-only peer" />
+                                <div class="w-12 h-6 bg-gray-200 rounded-full peer peer-checked:bg-brand-600 transition-all relative">
+                                    <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-all peer-checked:left-6"></div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Save -->
+                    <div>
+                        <button (click)="savePhotoWall()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold hover:from-gray-600 hover:to-gray-700 transition-all">Save Photo Wall</button>
                     </div>
                 </div>
 
                 <!-- Moderation Tab -->
                 <div *ngIf="activeTab === 'moderation'" class="max-w-3xl space-y-8 animate-fade-in">
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-4">Content Moderation</h3>
-                        <p class="text-sm text-gray-600">Coming soon...</p>
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Moderation</h3>
+                        <p class="text-sm text-gray-600">Control how content enters your album and who can help you moderate it.</p>
+                    </div>
+
+                    <!-- Require Approval -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-gray-900">Manually Approve Guest Uploads
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">Pro</span>
+                        </label>
+                        <p class="text-sm text-gray-600">Review uploads before they appear on your Photo Wall and Digital Album.</p>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" [(ngModel)]="requireApproval" class="sr-only peer" />
+                            <div class="w-12 h-6 bg-gray-200 rounded-full peer peer-checked:bg-brand-600 transition-all relative">
+                                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-all peer-checked:left-6"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Allowed Media Types (simple display) -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-bold text-gray-900">Allowed Media Types <span class="ml-2 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">Plus</span></label>
+                        <p class="text-sm text-gray-600">Control what type of media can be uploaded to your event.</p>
+                        <div class="flex items-center gap-3 text-sm text-gray-700">
+                            <span class="px-3 py-1 rounded-lg bg-gray-100">Photos</span>
+                            <span class="px-3 py-1 rounded-lg bg-gray-100">Videos</span>
+                            <span class="px-3 py-1 rounded-lg bg-gray-100">Text</span>
+                        </div>
+                    </div>
+
+                    <!-- Moderators -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-bold text-gray-900">Moderators</label>
+                        <p class="text-sm text-gray-600">Add people who can approve uploads and manage content.</p>
+                        <div class="flex items-stretch gap-2">
+                            <input type="email" [(ngModel)]="newModeratorEmail" placeholder="moderator@example.com"
+                                   class="flex-1 px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
+                            <button (click)="addModerator()"
+                                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold hover:from-brand-500 hover:to-brand-600 transition-all">
+                                Add
+                            </button>
+                        </div>
+
+                        <div *ngIf="moderators.length" class="flex flex-wrap gap-2 mt-2">
+                            <div *ngFor="let m of moderators; let i = index"
+                                 class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-200 text-sm">
+                                <span class="text-gray-800 font-medium">{{ m }}</span>
+                                <button (click)="removeModerator(i)" class="text-gray-500 hover:text-gray-700">&times;</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save -->
+                    <div>
+                        <button (click)="saveModeration()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold hover:from-gray-600 hover:to-gray-700 transition-all">Save Moderation</button>
                     </div>
                 </div>
 

@@ -36,16 +36,24 @@ export class SettingsComponent {
     primaryColor = '#fd0a90';
     coverImage = '';
     logoImage = '';
+    displayLanguage: 'en' | 'yo' | 'fr' = 'en';
+    welcomeScreenEnabled = false;
+    removeBranding = false;
 
     // Photo Wall settings
-    autoApprove = true;
-    showGuestNames = true;
-    slideshowSpeed = 5;
+    imageDuration = 8; // seconds
+    videoDuration = 12; // seconds
+    wallBackground = '';
+    hideSideImages = false;
+    hideQrCode = false;
+    hideCaption = false;
 
     // Moderation settings
     requireApproval = false;
     allowComments = true;
     profanityFilter = true;
+    moderators: string[] = [];
+    newModeratorEmail = '';
 
     // Collaborators
     collaborators: Array<{ email: string, role: 'admin' | 'editor' | 'viewer' }> = [];
@@ -83,15 +91,73 @@ export class SettingsComponent {
     }
 
     saveAppearance() {
-        console.log('Saving appearance settings...');
+        const payload = {
+            primaryColor: this.primaryColor,
+            displayLanguage: this.displayLanguage,
+            welcomeScreenEnabled: this.welcomeScreenEnabled,
+            removeBranding: this.removeBranding,
+            logoImage: this.logoImage,
+            coverImage: this.coverImage
+        };
+        try {
+            localStorage.setItem('eventAppearance', JSON.stringify(payload));
+            console.log('Appearance saved', payload);
+        } catch (e) {
+            console.error('Failed to save appearance', e);
+        }
     }
 
     savePhotoWall() {
-        console.log('Saving photo wall settings...');
+        const payload = {
+            imageDuration: this.imageDuration,
+            videoDuration: this.videoDuration,
+            wallBackground: this.wallBackground,
+            hideSideImages: this.hideSideImages,
+            hideQrCode: this.hideQrCode,
+            hideCaption: this.hideCaption
+        };
+        try {
+            localStorage.setItem('photoWallSettings', JSON.stringify(payload));
+            console.log('Photo Wall settings saved', payload);
+        } catch (e) {
+            console.error('Failed to save Photo Wall settings', e);
+        }
     }
 
     saveModeration() {
-        console.log('Saving moderation settings...');
+        const payload = {
+            requireApproval: this.requireApproval,
+            allowComments: this.allowComments,
+            profanityFilter: this.profanityFilter,
+            moderators: this.moderators
+        };
+        try {
+            localStorage.setItem('moderationSettings', JSON.stringify(payload));
+            console.log('Moderation settings saved', payload);
+        } catch (e) {
+            console.error('Failed to save moderation settings', e);
+        }
+    }
+
+    addModerator() {
+        const email = (this.newModeratorEmail || '').trim().toLowerCase();
+        if (!email) return;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            console.warn('Invalid email address');
+            return;
+        }
+        if (this.moderators.includes(email)) {
+            console.warn('Moderator already added');
+            this.newModeratorEmail = '';
+            return;
+        }
+        this.moderators.push(email);
+        this.newModeratorEmail = '';
+    }
+
+    removeModerator(index: number) {
+        this.moderators.splice(index, 1);
     }
 
     addCollaborator() {
@@ -112,7 +178,19 @@ export class SettingsComponent {
         console.log('Uploading cover image...');
     }
 
+    uploadPhotoWallBackground() {
+        console.log('Uploading photo wall background...');
+    }
+
     uploadLogo() {
         console.log('Uploading logo...');
+    }
+
+    toggleWelcomeScreen() {
+        this.welcomeScreenEnabled = !this.welcomeScreenEnabled;
+    }
+
+    upgradeToPro() {
+        console.log('Upgrade flow not implemented yet.');
     }
 }

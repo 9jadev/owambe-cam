@@ -1,8 +1,8 @@
 import { HttpInterceptorFn, HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
-import { AuthHttpService } from '../auth-http.service';
-import { ToastService } from '../toast.service';
+import { AuthHttpService } from '../services/auth-http.service';
+import { ToastService } from '../services/toast.service';
 
 const isRefreshUrl = (url: string) => url.includes('/refresh');
 

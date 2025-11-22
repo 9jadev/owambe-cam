@@ -2,8 +2,8 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from './auth.service';
-import { AuthHttpService } from './auth-http.service';
+import { AuthService } from './services/auth.service';
+import { AuthHttpService } from './services/auth-http.service';
 
 @Component({
   standalone: true,
