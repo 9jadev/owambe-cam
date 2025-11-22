@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { EventsHttpService } from './services/events-http.service';
+import { EventsHttpService } from '../services/events-http.service';
 
 type EventType = 'wedding' | 'party' | 'conference' | 'birthday' | 'other';
 

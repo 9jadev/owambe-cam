@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { AuthHttpService } from './services/auth-http.service';
-import { EventsHttpService, EventItemResponse } from './services/events-http.service';
+import { AuthHttpService } from '../services/auth-http.service';
+import { EventsHttpService, EventItemResponse } from '../services/events-http.service';
 
 interface EventItem {
   id: string;

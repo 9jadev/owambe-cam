@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthHttpService } from './services/auth-http.service';
-import { EventsHttpService, EventItemResponse } from './services/events-http.service';
+import { AuthHttpService } from '../services/auth-http.service';
+import { EventsHttpService, EventItemResponse } from '../services/events-http.service';
 
 @Component({
     standalone: true,
