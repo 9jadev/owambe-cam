@@ -14,6 +14,7 @@ export interface EventItemResponse {
   name: string;
   date: string;
   type: string;
+  slug?: string;
   // add fields as backend returns
 }
 
@@ -25,6 +26,7 @@ export interface CreateEventResponse {
 @Injectable({ providedIn: 'root' })
 export class EventsHttpService {
   private eventsPath = '/customer/events';
+  private publicEventsPath = '/events';
 
   constructor(private backend: BackendService, private toast: ToastService) {}
 
@@ -37,6 +39,12 @@ export class EventsHttpService {
   listEvents(): Observable<EventItemResponse[]> {
     return this.backend.get<any>(this.eventsPath).pipe(
       map((res) => (Array.isArray(res) ? res : (res?.events || res?.data || [])) as EventItemResponse[])
+    );
+  }
+
+  getEventBySlug(slug: string): Observable<EventItemResponse> {
+    return this.backend.get<any>(`${this.eventsPath}/${slug}`).pipe(
+      map((res) => (res?.event || res?.data || res) as EventItemResponse)
     );
   }
 }

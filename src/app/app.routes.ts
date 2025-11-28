@@ -8,6 +8,10 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.component').then(m => m.HomeComponent)
   },
   {
+    path: 'album/:slug',
+    loadComponent: () => import('./album/album.component').then(m => m.AlbumComponent)
+  },
+  {
     path: 'camera',
     loadComponent: () => import('./camera/camera.component').then(m => m.CameraComponent)
   },
@@ -37,7 +41,7 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'dashboard/event',
+    path: 'dashboard/event/:slug',
     loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },

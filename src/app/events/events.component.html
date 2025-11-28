@@ -41,8 +41,9 @@
         </div>
 
         <!-- Sidebar -->
-        <aside
-            class="fixed top-0 left-0 h-screen z-50 lg:z-auto flex flex-col w-72 bg-white border-r border-gray-200 shadow-premium-lg lg:shadow-sm transition-transform duration-300"
+        <app-dashboard-sidebar [collapsed]="sidebarCollapsed" [user]="user" [hasEvents]="hasEvents" [currentEventName]="currentEventName"></app-dashboard-sidebar>
+        <aside *ngIf="false"
+            class="fixed left-0 top-0 h-screen lg:top-16 lg:h-[calc(100vh-64px)] z-50 lg:z-auto flex flex-col w-72 bg-white border-r border-gray-200 shadow-premium-lg lg:shadow-sm transition-transform duration-300"
             [class.-translate-x-full]="!sidebarCollapsed" [class.translate-x-0]="sidebarCollapsed"
             [class.lg:translate-x-0]="true">
             <div class="p-4 border-b border-gray-200">
@@ -143,7 +144,7 @@
                         </div>
 
                         <!-- Action Button -->
-                        <button *ngIf="!event.isCurrent" (click)="viewEvent(event.id)" routerLink="/dashboard/event"
+                        <button *ngIf="!event.isCurrent" (click)="viewEvent(event.slug)" [routerLink]="['/dashboard/event', event.slug]"
                             class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all flex items-center justify-center gap-2">
                             View Event
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

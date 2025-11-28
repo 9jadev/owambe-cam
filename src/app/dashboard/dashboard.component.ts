@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthHttpService } from '../services/auth-http.service';
 import { EventsHttpService, EventItemResponse } from '../services/events-http.service';
+import { DashboardSidebarComponent } from './sidebar.component';
 
 @Component({
     standalone: true,
     selector: 'app-dashboard',
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, DashboardSidebarComponent],
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss']
 })
@@ -26,7 +27,9 @@ export class DashboardComponent {
 
     sidebarCollapsed = false;
 
-    constructor(private apiAuth: AuthHttpService, private eventsApi: EventsHttpService) {}
+    constructor(private apiAuth: AuthHttpService, private eventsApi: EventsHttpService, private route: ActivatedRoute) {}
+
+    eventSlug: string | null = null;
 
     ngOnInit() {
         const stored = this.apiAuth.getStoredCustomer();
@@ -36,23 +39,43 @@ export class DashboardComponent {
             error: () => {}
         });
 
-        this.eventsApi.listEvents().subscribe({
-            next: (events) => {
-                if (events && events.length) {
-                    const e = events[0];
-                    const slug = (e.name || 'event').toLowerCase().replace(/\s+/g, '-');
+        // Capture event slug from route if present
+        this.eventSlug = this.route.snapshot.paramMap.get('slug');
+
+        if (this.eventSlug) {
+            this.eventsApi.getEventBySlug(this.eventSlug).subscribe({
+                next: (e) => {
+                    const slug = e.slug || this.eventSlug || (e.name || 'event').toLowerCase().replace(/\s+/g, '-');
                     this.currentEvent = {
                         name: e.name,
                         plan: 'Free',
                         albumUrl: `myowambe.cap/${slug}`,
                         photoWallUrl: `myowambe.cap/s/${slug}`
                     };
+                },
+                error: () => {
+                    // Fallback: keep defaults
                 }
-            },
-            error: () => {
-                // Keep defaults if loading events fails
-            }
-        });
+            });
+        } else {
+            this.eventsApi.listEvents().subscribe({
+                next: (events) => {
+                    if (events && events.length) {
+                        const e = events[0];
+                        const slug = (e.slug || e.name || 'event').toLowerCase().replace(/\s+/g, '-');
+                        this.currentEvent = {
+                            name: e.name,
+                            plan: 'Free',
+                            albumUrl: `myowambe.cap/${slug}`,
+                            photoWallUrl: `myowambe.cap/s/${slug}`
+                        };
+                    }
+                },
+                error: () => {
+                    // Keep defaults if loading events fails
+                }
+            });
+        }
     }
 
     toggleSidebar() {

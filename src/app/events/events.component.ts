@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { DashboardSidebarComponent } from '../dashboard/sidebar.component';
 import { AuthHttpService } from '../services/auth-http.service';
 import { EventsHttpService, EventItemResponse } from '../services/events-http.service';
 
 interface EventItem {
   id: string;
+  slug?: string;
   name: string;
   plan: 'Free' | 'Pro' | 'Premium';
   uploads: number;
@@ -16,7 +18,7 @@ interface EventItem {
 @Component({
   standalone: true,
   selector: 'app-events',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, DashboardSidebarComponent],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss']
 })
@@ -41,6 +43,7 @@ export class EventsComponent {
         console.log(items)
         this.events = (items || []).map((e) => ({
           id: String(e.id),
+          slug: (e as any).slug || (e.name ? e.name.toLowerCase().replace(/\s+/g, '-') : undefined),
           name: e.name,
           plan: 'Free',
           uploads: 0,
@@ -76,9 +79,12 @@ export class EventsComponent {
     this.router.navigateByUrl('/dashboard/create');
   }
 
-  viewEvent(eventId: string) {
-    console.log('Viewing event:', eventId);
-    // Navigate to event home
+  viewEvent(slug: string | undefined) {
+    if (!slug) {
+      console.warn('Missing event slug; cannot navigate');
+      return;
+    }
+    this.router.navigate(['/dashboard/event', slug]);
   }
 
   deleteEvent(eventId: string) {

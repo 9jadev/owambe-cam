@@ -1,0 +1,40 @@
+<div class="min-h-screen bg-gray-50">
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-200">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a routerLink="/" class="text-xl font-semibold text-gray-900">My Owambe Cap</a>
+      <nav class="text-sm text-gray-600">
+        <a routerLink="/dashboard" class="hover:text-gray-900">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-10">
+    <div class="flex items-center justify-between">
+      <h1 class="text-3xl font-bold text-gray-900">Album</h1>
+      <span class="text-xs font-mono rounded-md bg-gray-100 text-gray-700 px-2 py-1">{{ slug }}</span>
+    </div>
+
+    <div *ngIf="loading" class="mt-6 text-gray-600">Loading album…</div>
+    <div *ngIf="error && !loading" class="mt-6 text-red-600">{{ error }}</div>
+
+    <section *ngIf="event && !loading" class="mt-10">
+      <div class="rounded-2xl border border-gray-200 bg-white p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-900">{{ event.name }}</h2>
+            <p class="mt-1 text-gray-600">Type: {{ event.type }}</p>
+            <p class="mt-1 text-gray-600">Date: {{ event.date | date:'mediumDate' }}</p>
+          </div>
+          <a [routerLink]="['/dashboard/event', slug]"
+             class="px-4 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all">
+            Open in Dashboard
+          </a>
+        </div>
+
+        <div class="mt-8 text-gray-700">
+          Media grid placeholder. Hook up album media here.
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
