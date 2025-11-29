@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { AuthHttpService } from '../services/auth-http.service';
 import { EventsHttpService, EventItemResponse } from '../services/events-http.service';
 import { DashboardSidebarComponent } from './sidebar.component';
@@ -27,7 +27,12 @@ export class DashboardComponent {
 
     sidebarCollapsed = false;
 
-    constructor(private apiAuth: AuthHttpService, private eventsApi: EventsHttpService, private route: ActivatedRoute) {}
+    constructor(
+        private apiAuth: AuthHttpService,
+        private eventsApi: EventsHttpService,
+        private route: ActivatedRoute,
+        private router: Router
+    ) {}
 
     eventSlug: string | null = null;
 
@@ -53,8 +58,12 @@ export class DashboardComponent {
                         photoWallUrl: `myowambe.cap/s/${slug}`
                     };
                 },
-                error: () => {
-                    // Fallback: keep defaults
+                error: (err) => {
+                    if (err && err.status === 404) {
+                        this.router.navigate(['/dashboard']);
+                    } else {
+                        // Fallback: keep defaults
+                    }
                 }
             });
         } else {

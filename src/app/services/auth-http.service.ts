@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, map } from 'rxjs';
 import { ToastService } from './toast.service';
@@ -36,7 +37,10 @@ export interface MeResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthHttpService {
-  constructor(private http: HttpClient, private toast: ToastService, private backend: BackendService) {}
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+
+  constructor(private http: HttpClient, private toast: ToastService, private backend: BackendService) { }
   private customerPath = `/customer`;
   private tokenKey = 'auth.token';
   private expiresKey = 'auth.expiresAt';
@@ -48,7 +52,9 @@ export class AuthHttpService {
       .pipe(
         tap((res: AuthResponse) => {
           this.setToken(res.token, res.expires_in);
-          if (res.customer) localStorage.setItem(this.userKey, JSON.stringify(res.customer));
+          if (res.customer && this.isBrowser) {
+            localStorage.setItem(this.userKey, JSON.stringify(res.customer));
+          }
           this.toast.success(res.message || 'Signup successful');
         })
       );
@@ -80,7 +86,9 @@ export class AuthHttpService {
     return this.backend.get<MeResponse>(`${this.customerPath}/me`).pipe(
       map((res: MeResponse) => res.customer),
       tap((customer: Customer) => {
-        localStorage.setItem(this.userKey, JSON.stringify(customer));
+        if (this.isBrowser) {
+          localStorage.setItem(this.userKey, JSON.stringify(customer));
+        }
         this.toast.info('Profile updated');
       })
     );
@@ -92,10 +100,12 @@ export class AuthHttpService {
   }
 
   getToken(): string | null {
+    if (!this.isBrowser) return null;
     return localStorage.getItem(this.tokenKey);
   }
 
   getTokenExpiry(): number | null {
+    if (!this.isBrowser) return null;
     const v = localStorage.getItem(this.expiresKey);
     return v ? Number(v) : null;
   }
@@ -107,6 +117,7 @@ export class AuthHttpService {
   }
 
   clearToken(): void {
+    if (!this.isBrowser) return;
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.expiresKey);
     localStorage.removeItem(this.userKey);
@@ -114,6 +125,7 @@ export class AuthHttpService {
 
   // Read the last stored customer from localStorage
   getStoredCustomer(): Customer | null {
+    if (!this.isBrowser) return null;
     const raw = localStorage.getItem(this.userKey);
     try {
       return raw ? (JSON.parse(raw) as Customer) : null;
@@ -123,6 +135,7 @@ export class AuthHttpService {
   }
 
   private setToken(token: string, expiresInSeconds: number): void {
+    if (!this.isBrowser) return;
     const expiresAt = Date.now() + expiresInSeconds * 1000;
     localStorage.setItem(this.tokenKey, token);
     localStorage.setItem(this.expiresKey, String(expiresAt));

@@ -1,0 +1,368 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50 flex flex-col">
+    <!-- Fixed Dashboard Header -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-gray-200/50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button (click)="toggleSidebar()"
+                    class="lg:hidden p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <div
+                    class="h-10 w-10 rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 shadow-premium flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <span
+                    class="font-bold text-xl tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Owambe
+                    Cam</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100">
+                    <div
+                        class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-sm">
+                        {{ user.email.charAt(0).toUpperCase() }}
+                    </div>
+                    <span class="text-sm font-medium text-gray-700">{{ user.email }}</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Mobile Overlay -->
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+            [class.opacity-0]="!sidebarCollapsed" [class.pointer-events-none]="!sidebarCollapsed"
+            (click)="toggleSidebar()">
+        </div>
+
+        <!-- Sidebar -->
+        <aside
+            class="fixed top-0 left-0 h-screen z-50 lg:z-auto flex flex-col w-72 bg-white border-r border-gray-200 shadow-premium-lg lg:shadow-sm transition-transform duration-300"
+            [class.-translate-x-full]="!sidebarCollapsed" [class.translate-x-0]="sidebarCollapsed"
+            [class.lg:translate-x-0]="true">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-10 w-10 rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 shadow-premium flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <span
+                        class="font-bold text-xl tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Owambe
+                        Cam</span>
+                </div>
+            </div>
+
+            <div class="p-4 border-b border-gray-200">
+                <div class="text-xs font-semibold text-gray-500 mb-2">Current Event</div>
+                <div class="px-4 py-3 rounded-xl border-2 border-brand-600 bg-brand-50/50">
+                    <div class="flex items-center justify-between">
+                        <div class="font-bold text-gray-900">{{ currentEvent.name }}</div>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+                <button
+                    class="mt-3 w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold shadow-premium hover:shadow-premium-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    Upgrade Your Event
+                </button>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+                <a routerLink="/dashboard"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    My Events
+                </a>
+                <a routerLink="/dashboard/event"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    Home
+                </a>
+                <a routerLink="/dashboard/media"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Photos & Videos
+                </a>
+                <a routerLink="/dashboard/settings"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl bg-brand-50 text-brand-700 font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Event Settings
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-gray-200">
+                <div class="px-4 py-3 rounded-xl bg-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold">
+                            {{ user.email.charAt(0).toUpperCase() }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-semibold text-gray-900">My Account</div>
+                            <div class="text-xs text-gray-600 truncate">{{ user.email }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto lg:ml-72">
+            <!-- Tabs -->
+            <div class="px-4 sm:px-6 mt-6">
+                <div class="flex items-center gap-1 border-b border-gray-200 overflow-x-auto">
+                    <button (click)="setTab('general')"
+                        class="px-4 py-3 font-medium text-sm whitespace-nowrap transition-all border-b-2"
+                        [class.border-brand-600]="activeTab === 'general'"
+                        [class.text-brand-700]="activeTab === 'general'"
+                        [class.border-transparent]="activeTab !== 'general'"
+                        [class.text-gray-600]="activeTab !== 'general'"
+                        [class.hover:text-gray-900]="activeTab !== 'general'">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                            General
+                        </span>
+                    </button>
+                    <button (click)="setTab('appearance')"
+                        class="px-4 py-3 font-medium text-sm whitespace-nowrap transition-all border-b-2"
+                        [class.border-brand-600]="activeTab === 'appearance'"
+                        [class.text-brand-700]="activeTab === 'appearance'"
+                        [class.border-transparent]="activeTab !== 'appearance'"
+                        [class.text-gray-600]="activeTab !== 'appearance'"
+                        [class.hover:text-gray-900]="activeTab !== 'appearance'">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                            </svg>
+                            Appearance
+                        </span>
+                    </button>
+                    <button (click)="setTab('photo-wall')"
+                        class="px-4 py-3 font-medium text-sm whitespace-nowrap transition-all border-b-2"
+                        [class.border-brand-600]="activeTab === 'photo-wall'"
+                        [class.text-brand-700]="activeTab === 'photo-wall'"
+                        [class.border-transparent]="activeTab !== 'photo-wall'"
+                        [class.text-gray-600]="activeTab !== 'photo-wall'"
+                        [class.hover:text-gray-900]="activeTab !== 'photo-wall'">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Photo Wall
+                        </span>
+                    </button>
+                    <button (click)="setTab('moderation')"
+                        class="px-4 py-3 font-medium text-sm whitespace-nowrap transition-all border-b-2"
+                        [class.border-brand-600]="activeTab === 'moderation'"
+                        [class.text-brand-700]="activeTab === 'moderation'"
+                        [class.border-transparent]="activeTab !== 'moderation'"
+                        [class.text-gray-600]="activeTab !== 'moderation'"
+                        [class.hover:text-gray-900]="activeTab !== 'moderation'">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            Moderation
+                        </span>
+                    </button>
+                    <button (click)="setTab('collaborators')"
+                        class="px-4 py-3 font-medium text-sm whitespace-nowrap transition-all border-b-2"
+                        [class.border-brand-600]="activeTab === 'collaborators'"
+                        [class.text-brand-700]="activeTab === 'collaborators'"
+                        [class.border-transparent]="activeTab !== 'collaborators'"
+                        [class.text-gray-600]="activeTab !== 'collaborators'"
+                        [class.hover:text-gray-900]="activeTab !== 'collaborators'">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Collaborators
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-4 sm:p-6">
+                <!-- General Tab -->
+                <div *ngIf="activeTab === 'general'" class="max-w-3xl space-y-8 animate-fade-in">
+                    <!-- Event Name -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">Event Name</label>
+                        <p class="text-sm text-gray-600 mb-3">It'll be used through the app and will be showed to your
+                            guests.</p>
+                        <input type="text" [(ngModel)]="eventName"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all"
+                            placeholder="Enter event name" />
+                    </div>
+
+                    <!-- Event Date -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">Event Date</label>
+                        <p class="text-sm text-gray-600 mb-3">Set when your event is scheduled to start.</p>
+                        <input type="date" [(ngModel)]="eventDate"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all" />
+                    </div>
+
+                    <!-- Event Type -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">Event Type</label>
+                        <p class="text-sm text-gray-600 mb-3">We'll adjust the experience according to your event type.
+                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            <button (click)="setEventType('wedding')"
+                                class="px-4 py-2.5 rounded-xl border transition-all font-medium"
+                                [class.border-brand-600]="eventType === 'wedding'"
+                                [class.bg-brand-50]="eventType === 'wedding'"
+                                [class.text-brand-700]="eventType === 'wedding'"
+                                [class.border-gray-300]="eventType !== 'wedding'"
+                                [class.bg-white]="eventType !== 'wedding'"
+                                [class.text-gray-700]="eventType !== 'wedding'">
+                                💍 Wedding
+                            </button>
+                            <button (click)="setEventType('party')"
+                                class="px-4 py-2.5 rounded-xl border transition-all font-medium"
+                                [class.border-brand-600]="eventType === 'party'"
+                                [class.bg-brand-50]="eventType === 'party'"
+                                [class.text-brand-700]="eventType === 'party'"
+                                [class.border-gray-300]="eventType !== 'party'" [class.bg-white]="eventType !== 'party'"
+                                [class.text-gray-700]="eventType !== 'party'">
+                                🎉 Party
+                            </button>
+                            <button (click)="setEventType('conference')"
+                                class="px-4 py-2.5 rounded-xl border transition-all font-medium"
+                                [class.border-brand-600]="eventType === 'conference'"
+                                [class.bg-brand-50]="eventType === 'conference'"
+                                [class.text-brand-700]="eventType === 'conference'"
+                                [class.border-gray-300]="eventType !== 'conference'"
+                                [class.bg-white]="eventType !== 'conference'"
+                                [class.text-gray-700]="eventType !== 'conference'">
+                                🎤 Conference
+                            </button>
+                            <button (click)="setEventType('birthday')"
+                                class="px-4 py-2.5 rounded-xl border transition-all font-medium"
+                                [class.border-brand-600]="eventType === 'birthday'"
+                                [class.bg-brand-50]="eventType === 'birthday'"
+                                [class.text-brand-700]="eventType === 'birthday'"
+                                [class.border-gray-300]="eventType !== 'birthday'"
+                                [class.bg-white]="eventType !== 'birthday'"
+                                [class.text-gray-700]="eventType !== 'birthday'">
+                                🎂 Birthday
+                            </button>
+                            <button (click)="setEventType('other')"
+                                class="px-4 py-2.5 rounded-xl border transition-all font-medium"
+                                [class.border-brand-600]="eventType === 'other'"
+                                [class.bg-brand-50]="eventType === 'other'"
+                                [class.text-brand-700]="eventType === 'other'"
+                                [class.border-gray-300]="eventType !== 'other'" [class.bg-white]="eventType !== 'other'"
+                                [class.text-gray-700]="eventType !== 'other'">
+                                ❓ Other
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Link -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-900 mb-2">
+                            Event Custom Link
+                            <span class="ml-2 px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">★
+                                Pro</span>
+                            <button
+                                class="ml-2 text-brand-600 hover:text-brand-700 text-xs font-semibold">Upgrade</button>
+                        </label>
+                        <p class="text-sm text-gray-600 mb-3">Choose a unique link ending to easily share your event
+                            with
+                            guests.</p>
+                        <div class="flex items-stretch gap-2">
+                            <div
+                                class="flex-1 flex items-stretch overflow-hidden rounded-xl border border-gray-300 bg-white">
+                                <span
+                                    class="px-4 py-3 bg-gray-50 text-gray-600 text-sm font-medium border-r border-gray-200">app.kululu.com/</span>
+                                <input type="text" [(ngModel)]="customLink" class="flex-1 px-4 py-3 focus:outline-none"
+                                    placeholder="your-event" />
+                            </div>
+                            <button (click)="saveGeneral()"
+                                class="px-6 py-3 rounded-xl bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold hover:from-gray-600 hover:to-gray-700 transition-all">
+                                Save
+                            </button>
+                        </div>
+                        <button (click)="suggestLink()"
+                            class="mt-2 text-sm text-brand-600 hover:text-brand-700 font-semibold flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Suggest
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Appearance Tab -->
+                <div *ngIf="activeTab === 'appearance'" class="max-w-3xl space-y-8 animate-fade-in">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Customize Your Event's Look</h3>
+                        <p class="text-sm text-gray-600">Coming soon...</p>
+                    </div>
+                </div>
+
+                <!-- Photo Wall Tab -->
+                <div *ngIf="activeTab === 'photo-wall'" class="max-w-3xl space-y-8 animate-fade-in">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Photo Wall Settings</h3>
+                        <p class="text-sm text-gray-600">Coming soon...</p>
+                    </div>
+                </div>
+
+                <!-- Moderation Tab -->
+                <div *ngIf="activeTab === 'moderation'" class="max-w-3xl space-y-8 animate-fade-in">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Content Moderation</h3>
+                        <p class="text-sm text-gray-600">Coming soon...</p>
+                    </div>
+                </div>
+
+                <!-- Collaborators Tab -->
+                <div *ngIf="activeTab === 'collaborators'" class="max-w-3xl space-y-8 animate-fade-in">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Manage Collaborators</h3>
+                        <p class="text-sm text-gray-600">Coming soon...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, PLATFORM_ID, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -14,6 +14,9 @@ type EventType = 'wedding' | 'party' | 'conference' | 'birthday' | 'other';
     styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
+    private platformId = inject(PLATFORM_ID);
+    private isBrowser = isPlatformBrowser(this.platformId);
+
     currentEvent = {
         name: 'Class',
         plan: 'Free'
@@ -100,7 +103,9 @@ export class SettingsComponent {
             coverImage: this.coverImage
         };
         try {
-            localStorage.setItem('eventAppearance', JSON.stringify(payload));
+            if (this.isBrowser) {
+                localStorage.setItem('eventAppearance', JSON.stringify(payload));
+            }
             console.log('Appearance saved', payload);
         } catch (e) {
             console.error('Failed to save appearance', e);
@@ -117,7 +122,9 @@ export class SettingsComponent {
             hideCaption: this.hideCaption
         };
         try {
-            localStorage.setItem('photoWallSettings', JSON.stringify(payload));
+            if (this.isBrowser) {
+                localStorage.setItem('photoWallSettings', JSON.stringify(payload));
+            }
             console.log('Photo Wall settings saved', payload);
         } catch (e) {
             console.error('Failed to save Photo Wall settings', e);
@@ -132,7 +139,9 @@ export class SettingsComponent {
             moderators: this.moderators
         };
         try {
-            localStorage.setItem('moderationSettings', JSON.stringify(payload));
+            if (this.isBrowser) {
+                localStorage.setItem('moderationSettings', JSON.stringify(payload));
+            }
             console.log('Moderation settings saved', payload);
         } catch (e) {
             console.error('Failed to save moderation settings', e);

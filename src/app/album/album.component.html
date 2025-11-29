@@ -1,40 +1,209 @@
-<div class="min-h-screen bg-gray-50">
-  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-200">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-      <a routerLink="/" class="text-xl font-semibold text-gray-900">My Owambe Cap</a>
-      <nav class="text-sm text-gray-600">
-        <a routerLink="/dashboard" class="hover:text-gray-900">Dashboard</a>
-      </nav>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30">
+  <!-- Loading State with Premium Design -->
+  <div *ngIf="loading"
+    class="fixed inset-0 bg-gradient-to-br from-gray-900 via-slate-800 to-black flex items-center justify-center z-50">
+    <div class="text-center">
+      <div class="relative w-24 h-24 mx-auto mb-6">
+        <div class="absolute inset-0 border-4 border-brand-500/20 rounded-full"></div>
+        <div class="absolute inset-0 border-4 border-transparent border-t-brand-500 rounded-full animate-spin"></div>
+      </div>
+      <h2 class="text-2xl font-bold text-white mb-2 tracking-tight">Loading Album</h2>
+      <p class="text-slate-400 font-medium">Preparing your experience...</p>
     </div>
-  </header>
+  </div>
 
-  <main class="max-w-5xl mx-auto px-4 py-10">
-    <div class="flex items-center justify-between">
-      <h1 class="text-3xl font-bold text-gray-900">Album</h1>
-      <span class="text-xs font-mono rounded-md bg-gray-100 text-gray-700 px-2 py-1">{{ slug }}</span>
+  <!-- Error State with Premium Design -->
+  <div *ngIf="error && !loading"
+    class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50/30 flex items-center justify-center px-4">
+    <div class="text-center max-w-md">
+      <div
+        class="w-24 h-24 mx-auto mb-8 rounded-2xl bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center shadow-premium">
+        <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h2 class="text-3xl font-bold text-gray-900 mb-3 tracking-tight">{{ error }}</h2>
+      <p class="text-slate-600 mb-8 leading-relaxed">We couldn't load this album. Please check the link and try again.
+      </p>
+      <a routerLink="/"
+        class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold shadow-premium hover:shadow-premium-lg hover:scale-105 transition-all">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        Return Home
+      </a>
     </div>
+  </div>
 
-    <div *ngIf="loading" class="mt-6 text-gray-600">Loading album…</div>
-    <div *ngIf="error && !loading" class="mt-6 text-red-600">{{ error }}</div>
-
-    <section *ngIf="event && !loading" class="mt-10">
-      <div class="rounded-2xl border border-gray-200 bg-white p-6">
-        <div class="flex items-start justify-between">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-900">{{ event.name }}</h2>
-            <p class="mt-1 text-gray-600">Type: {{ event.type }}</p>
-            <p class="mt-1 text-gray-600">Date: {{ event.date | date:'mediumDate' }}</p>
-          </div>
-          <a [routerLink]="['/dashboard/event', slug]"
-             class="px-4 py-2.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all">
-            Open in Dashboard
-          </a>
-        </div>
-
-        <div class="mt-8 text-gray-700">
-          Media grid placeholder. Hook up album media here.
+  <!-- Album Content -->
+  <div *ngIf="event && !loading" class="relative">
+    <!-- Hero Section with Background -->
+    <div class="relative h-screen flex items-center justify-center overflow-hidden">
+      <!-- Dynamic Background Slideshow -->
+      <div class="absolute inset-0">
+        <!-- Image slides -->
+        <div *ngFor="let image of heroImages; let i = index"
+          class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+          [class.opacity-100]="currentImageIndex === i" [class.opacity-0]="currentImageIndex !== i">
+          <img [src]="image" [alt]="'Event photo ' + (i + 1)" loading="lazy" (load)="onImageLoad()"
+            (error)="onImageError($event)" class="w-full h-full object-cover">
+          <!-- Dark overlay for text readability -->
+          <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/70"></div>
         </div>
       </div>
-    </section>
-  </main>
+
+      <!-- Branding Badge with Enhanced Design -->
+      <div class="absolute top-6 left-1/2 transform -translate-x-1/2 z-20">
+        <div
+          class="px-5 py-2.5 rounded-full bg-white/95 backdrop-blur-md shadow-premium border border-white/20 flex items-center gap-2.5 hover:scale-105 transition-transform duration-300">
+          <div
+            class="w-6 h-6 rounded-lg bg-gradient-to-br from-brand-600 via-brand-600 to-brand-700 flex items-center justify-center shadow-lg">
+            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span class="text-sm font-bold text-slate-900">Made with <span
+              class="bg-gradient-to-r from-brand-600 to-brand-700 bg-clip-text text-transparent">Owambe
+              Cam</span></span>
+        </div>
+      </div>
+
+      <!-- Central Content with Enhanced Typography -->
+      <div class="relative z-10 text-center px-4 max-w-5xl mx-auto">
+        <!-- Event Name with Gradient Glow -->
+        <h1
+          class="text-6xl md:text-7xl lg:text-8xl font-black text-white mb-10 tracking-tight drop-shadow-2xl leading-none">
+          <span class="inline-block animate-fade-in">{{ event.name }}</span>
+        </h1>
+
+        <!-- Add to Album Button with Premium Design -->
+        <button (click)="addToAlbum()" [routerLink]="['/add-to-album', slug]"
+          class="group relative px-10 py-5 rounded-2xl bg-gradient-to-r from-brand-500 via-brand-600 to-brand-700 hover:from-brand-600 hover:via-brand-700 hover:to-brand-800 text-white font-bold text-lg shadow-premium-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-3 mx-auto overflow-hidden">
+          <!-- Shimmer Effect -->
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000">
+          </div>
+
+          <svg class="w-6 h-6 group-hover:rotate-90 transition-transform duration-300 relative z-10" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="relative z-10">Add to album</span>
+        </button>
+
+        <!-- Photo Count with Enhanced Design -->
+        <div
+          class="mt-14 inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white">
+          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd"
+                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                clip-rule="evenodd" />
+            </svg>
+          </div>
+          <span class="font-bold text-lg">{{ photoCount }}</span>
+          <span class="font-medium text-white/90">photos & videos</span>
+        </div>
+      </div>
+
+      <!-- Scroll Indicator -->
+      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
+        <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+
+      <!-- Slideshow Navigation Dots -->
+      <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-20 flex gap-3">
+        <button *ngFor="let image of heroImages; let i = index" (click)="goToSlide(i)" type="button"
+          class="h-2 rounded-full transition-all duration-300 cursor-pointer hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50"
+          [ngClass]="{
+            'bg-white w-8': currentImageIndex === i,
+            'bg-white/40 w-2 hover:bg-white/60': currentImageIndex !== i
+          }" [attr.aria-label]="'Go to slide ' + (i + 1)"
+          [attr.aria-current]="currentImageIndex === i ? 'true' : 'false'">
+        </button>
+      </div>
+    </div>
+
+    <!-- Photo Gallery Section with Premium Design -->
+    <div class="relative bg-gradient-to-b from-white via-slate-50/50 to-white py-20 px-4">
+      <div class="max-w-7xl mx-auto">
+        <!-- Section Header with Enhanced Design -->
+        <div class="flex items-center justify-between mb-10">
+          <div>
+            <h2 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-2">Recent Uploads</h2>
+            <p class="text-slate-600 font-medium">Latest photos and videos from your guests</p>
+          </div>
+          <button
+            class="hidden md:flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-brand-50 to-purple-50 hover:from-brand-100 hover:to-purple-100 text-brand-700 font-bold shadow-sm hover:shadow-md transition-all">
+            <span>View all</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Photo Grid with Enhanced Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+          <!-- Dynamic Gallery Photos -->
+          <div *ngFor="let photo of galleryPhotos; let i = index"
+            class="group relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2">
+            <img [src]="photo.url" [alt]="'Photo by ' + photo.author" loading="lazy" (error)="onImageError($event)"
+              class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            <!-- Gradient Overlay -->
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            </div>
+
+            <!-- Info Badge on Hover -->
+            <div
+              class="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                  <svg class="w-4 h-4 text-brand-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </div>
+                <span class="text-sm font-bold text-white">{{ photo.author }}</span>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <button
+              class="absolute top-3 right-3 w-9 h-9 rounded-xl bg-white/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-lg hover:scale-110">
+              <svg class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Add More Photos Card with Enhanced Design -->
+          <div (click)="addToAlbum()" [routerLink]="['/add-to-album', slug]"
+            class="group relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-brand-50 via-purple-50 to-brand-50 border-2 border-dashed border-brand-300 hover:border-brand-500 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer flex items-center justify-center transform hover:-translate-y-2 hover:scale-105">
+            <div class="text-center relative z-10">
+              <div
+                class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 group-hover:from-brand-600 group-hover:to-brand-700 flex items-center justify-center transition-all shadow-premium group-hover:shadow-premium-lg group-hover:scale-110">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+              </div>
+              <p class="text-base font-bold text-brand-700">Add Photos</p>
+              <p class="text-xs text-slate-600 mt-1">Upload or capture</p>
+            </div>
+
+            <!-- Decorative Elements -->
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-brand-100/20 to-purple-100/20 opacity-0 group-hover:opacity-100 transition-opacity">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

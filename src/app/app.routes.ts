@@ -7,9 +7,22 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./home/home.component').then(m => m.HomeComponent)
   },
+  // {
+  //   path: 'event-album/:slug',
+  //   redirectTo: 'album/:slug',
+  //   pathMatch: 'full'
+  // },
   {
     path: 'album/:slug',
     loadComponent: () => import('./album/album.component').then(m => m.AlbumComponent)
+  },
+  {
+    path: 'add-to-album',
+    loadComponent: () => import('./add-to-album/add-to-album.component').then(m => m.AddToAlbumComponent)
+  },
+  {
+    path: 'add-to-album/:slug',
+    loadComponent: () => import('./add-to-album/add-to-album.component').then(m => m.AddToAlbumComponent)
   },
   {
     path: 'camera',
