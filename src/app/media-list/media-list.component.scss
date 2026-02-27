@@ -1,0 +1,28 @@
+.media-list {
+  .viewer {
+    height: 50vh;
+    min-height: 320px;
+    max-height: 70vh;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.35));
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  .thumbs {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  video, img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-color: #111;
+  }
+
+  input[type="range"] {
+    accent-color: #7c3aed; /* brand */
+  }
+}

@@ -1,0 +1,65 @@
+<div class="media-list">
+  <!-- Main viewer -->
+  <div class="viewer relative overflow-hidden rounded-2xl">
+    <!-- Previous item for cross-fade -->
+    <div class="absolute inset-0 transition-opacity duration-500 ease-in-out"
+         [ngClass]="{ 'opacity-100': transitioning, 'opacity-0': !transitioning }">
+      <ng-container *ngIf="items[prevIndex] as prev">
+        <img *ngIf="prev.type === 'photo'" [src]="prev.src" alt="" loading="lazy"
+             class="w-full h-full object-cover" />
+        <video *ngIf="prev.type === 'video'" muted [poster]="prev.poster || generatedPosters[prevIndex]"
+               class="w-full h-full object-cover"></video>
+      </ng-container>
+    </div>
+
+    <!-- Current item -->
+    <div class="absolute inset-0 transition-opacity duration-500 ease-in-out will-change-opacity"
+         [ngClass]="{ 'opacity-100': !transitioning, 'opacity-0': transitioning }">
+      <ng-container *ngIf="current as item">
+        <img *ngIf="item.type === 'photo'" [src]="item.src" alt="" loading="lazy"
+             class="w-full h-full object-cover" />
+
+        <div *ngIf="item.type === 'video'" class="relative w-full h-full">
+          <video #videoEl [attr.preload]="preloadStrategy" playsinline [poster]="item.poster || generatedPosters[currentIndex]"
+                 class="w-full h-full object-cover" [muted]="isMuted" [volume]="volume"
+                 (canplay)="onVideoCanPlay(currentIndex)" (waiting)="onVideoWaiting(currentIndex)"
+                 (error)="onVideoError(currentIndex)"></video>
+
+          <!-- Loading overlay -->
+          <div *ngIf="loadingCurrent" class="absolute inset-0 bg-black/20 grid place-items-center">
+            <div class="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+          </div>
+
+          <!-- Controls -->
+          <div class="absolute bottom-3 left-3 right-3 flex items-center gap-3 px-3 py-2 rounded-xl bg-black/30 text-white">
+            <button (click)="togglePlay()" class="w-8 h-8 rounded bg-white/20 grid place-items-center">
+              <svg *ngIf="isPlaying" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"/></svg>
+              <svg *ngIf="!isPlaying" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-5.197-3.027A1 1 0 008 9.027v5.946a1 1 0 001.555.832l5.197-3.027a1 1 0 000-1.64z"/></svg>
+            </button>
+            <button (click)="toggleMute()" class="w-8 h-8 rounded bg-white/20 grid place-items-center">
+              <svg *ngIf="isMuted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5L6 9H3v6h3l5 4V5m5 4l4 4m0-4l-4 4"/></svg>
+              <svg *ngIf="!isMuted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5L6 9H3v6h3l5 4V5m5 4a5 5 0 010 6m2-8a9 9 0 010 10"/></svg>
+            </button>
+            <input type="range" min="0" max="1" step="0.05" [value]="volume"
+                   (input)="setVolume($any($event.target).valueAsNumber)" class="flex-1" />
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Thumbnails strip -->
+  <div class="thumbs mt-3 flex gap-2 overflow-x-auto">
+    <button *ngFor="let it of items; let i = index" (click)="goTo(i)"
+            class="relative w-20 h-14 rounded-lg overflow-hidden border"
+            [ngClass]="{ 'border-brand-600': i === currentIndex, 'border-transparent': i !== currentIndex }">
+      <img *ngIf="it.type === 'photo'" [src]="it.src" alt="" loading="lazy" class="w-full h-full object-cover" />
+      <img *ngIf="it.type === 'video'" [src]="it.poster || generatedPosters[i]" alt="" loading="lazy" class="w-full h-full object-cover" />
+      <div *ngIf="it.type === 'video'" class="absolute inset-0 grid place-items-center bg-black/20">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-5.197-3.027A1 1 0 008 9.027v5.946a1 1 0 001.555.832l5.197-3.027a1 1 0 000-1.64z"/></svg>
+      </div>
+    </button>
+  </div>
+
+  <div *ngIf="errorMessage" class="mt-2 text-red-600 text-sm font-medium">{{ errorMessage }}</div>
+</div>

@@ -3,8 +3,13 @@
     <div
       class="flex items-center justify-between backdrop-blur-md bg-white/10 rounded-2xl px-5 py-3 border border-white/10">
       <h2 class="text-lg sm:text-xl font-bold text-white tracking-tight">Advanced Mobile Camera</h2>
-      <a class="px-4 py-2 rounded-xl bg-white text-gray-900 hover:bg-gray-100 font-medium shadow-premium transition-all hover:scale-105"
-        routerLink="/">Close</a>
+      <div class="flex items-center gap-2">
+        <a class="px-4 py-2 rounded-xl bg-white text-gray-900 hover:bg-gray-100 font-medium shadow-premium transition-all hover:scale-105"
+          routerLink="/">Close</a>
+        <a *ngIf="slug"
+          class="px-4 py-2 rounded-xl bg-brand-600 text-white hover:bg-brand-700 font-medium shadow-premium transition-all hover:scale-105"
+          [routerLink]="['/add-to-album', slug]">Back to Add to Album</a>
+      </div>
     </div>
 
     <!-- Settings collapsible for mobile -->
@@ -64,7 +69,16 @@
         </div>
 
         <div class="text-sm text-red-300 font-medium" *ngIf="permissionError">{{ permissionError }}</div>
-        <div class="text-sm text-brand-200 font-medium" *ngIf="infoMessage">{{ infoMessage }}</div>
+        <div class="text-sm font-medium" [class.text-brand-200]="!uploading" [class.text-white]="uploading" *ngIf="infoMessage">
+          <span *ngIf="uploading" class="inline-flex items-center gap-2">
+            <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            {{ infoMessage }}
+          </span>
+          <span *ngIf="!uploading">{{ infoMessage }}</span>
+        </div>
       </div>
 
       <!-- Right sidebar visible on md+ -->

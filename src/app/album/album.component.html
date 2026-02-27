@@ -41,16 +41,33 @@
   <div *ngIf="event && !loading" class="relative">
     <!-- Hero Section with Background -->
     <div class="relative h-screen flex items-center justify-center overflow-hidden">
-      <!-- Dynamic Background Slideshow -->
+      <!-- Dynamic Background: Video or Slideshow -->
       <div class="absolute inset-0">
-        <!-- Image slides -->
-        <div *ngFor="let image of heroImages; let i = index"
-          class="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-          [class.opacity-100]="currentImageIndex === i" [class.opacity-0]="currentImageIndex !== i">
-          <img [src]="image" [alt]="'Event photo ' + (i + 1)" loading="lazy" (load)="onImageLoad()"
-            (error)="onImageError($event)" class="w-full h-full object-cover">
-          <!-- Dark overlay for text readability -->
+        <!-- Background video -->
+        <video *ngIf="useVideo" #bgVideo
+          class="absolute inset-0 w-full h-full object-cover motion-safe:transition-opacity duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none"
+          [class.opacity-0]="transitioning" autoplay muted playsinline loop preload="metadata"
+          [attr.poster]="currentVideoPoster || heroPosterUrl || null" [src]="currentVideoSrc || null"
+          (canplay)="onVideoCanPlay()" (canplaythrough)="onVideoCanPlayThrough()" (error)="onVideoError($event)"
+          (ended)="onVideoEnded()" (pause)="onVideoPause()" (play)="onVideoPlay()">
+        </video>
+
+        <!-- Image fallback: dynamic hero image -->
+        <div *ngIf="!useVideo && (currentImageSrc || heroPosterUrl)" class="absolute inset-0">
+          <img [src]="currentImageSrc || heroPosterUrl" [alt]="event?.name + ' hero image'" loading="eager"
+            decoding="async" fetchpriority="high" (load)="onImageLoad()" (error)="onImageError($event)"
+            class="w-full h-full object-cover motion-safe:transition-opacity duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none">
           <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/70"></div>
+        </div>
+
+        <!-- Dark overlay for text readability over video -->
+        <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/70"></div>
+
+        <!-- Video error banner -->
+        <div *ngIf="videoError" class="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+          <div class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold shadow-md">
+            {{ videoError }}
+          </div>
         </div>
       </div>
 
@@ -109,6 +126,32 @@
         </div>
       </div>
 
+      <!-- Video controls -->
+      <div *ngIf="useVideo" class="absolute bottom-8 right-8 z-20">
+        <div
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-premium">
+          <button (click)="togglePlay()" class="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center">
+            <svg *ngIf="isVideoPlaying" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6" />
+            </svg>
+            <svg *ngIf="!isVideoPlaying" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M14.752 11.168l-5.197-3.027A1 1 0 008 9.027v5.946a1 1 0 001.555.832l5.197-3.027a1 1 0 000-1.64z" />
+            </svg>
+          </button>
+          <button (click)="toggleMute()" class="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center">
+            <svg *ngIf="isMuted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5L6 9H3v6h3l5 4V5m5 4l4 4m0-4l-4 4" />
+            </svg>
+            <svg *ngIf="!isMuted" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5L6 9H3v6h3l5 4V5m5 4a5 5 0 010 6m2-8a9 9 0 010 10" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <!-- Scroll Indicator -->
       <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
         <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,17 +159,8 @@
         </svg>
       </div>
 
-      <!-- Slideshow Navigation Dots -->
-      <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-20 flex gap-3">
-        <button *ngFor="let image of heroImages; let i = index" (click)="goToSlide(i)" type="button"
-          class="h-2 rounded-full transition-all duration-300 cursor-pointer hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50"
-          [ngClass]="{
-            'bg-white w-8': currentImageIndex === i,
-            'bg-white/40 w-2 hover:bg-white/60': currentImageIndex !== i
-          }" [attr.aria-label]="'Go to slide ' + (i + 1)"
-          [attr.aria-current]="currentImageIndex === i ? 'true' : 'false'">
-        </button>
-      </div>
+      <!-- Slideshow Navigation Dots (hidden when using single hero image) -->
+      <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-20 flex gap-3" *ngIf="false"></div>
     </div>
 
     <!-- Photo Gallery Section with Premium Design -->
@@ -151,7 +185,7 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
           <!-- Dynamic Gallery Photos -->
           <div *ngFor="let photo of galleryPhotos; let i = index"
-            class="group relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2">
+            (click)="openModal(i)" class="group relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50 shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2">
             <img [src]="photo.url" [alt]="'Photo by ' + photo.author" loading="lazy" (error)="onImageError($event)"
               class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
             <!-- Gradient Overlay -->
@@ -202,6 +236,50 @@
               class="absolute inset-0 bg-gradient-to-br from-brand-100/20 to-purple-100/20 opacity-0 group-hover:opacity-100 transition-opacity">
             </div>
           </div>
+        </div>
+
+       
+      </div>
+    </div>
+
+    <!-- Modal Media Viewer -->
+    <div *ngIf="showModal" class="fixed inset-0 z-[1000]" role="dialog" aria-modal="true" aria-label="Media viewer">
+      <div class="absolute inset-0 bg-black/70 motion-safe:transition-opacity duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none" [class.opacity-0]="modalTransitioning"></div>
+      <div class="relative z-10 h-full w-full flex items-center justify-center px-4">
+        <!-- Close button -->
+        <button (click)="closeModal()" aria-label="Close image viewer"
+                class="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/90 text-gray-900 shadow-lg hover:scale-105 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center focus-visible:ring-2 ring-brand-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+
+        <!-- Prev arrow -->
+        <button (click)="prevModal()" aria-label="Previous item"
+                class="absolute left-4 md:left-8 w-11 h-11 rounded-full bg-white/90 text-gray-900 shadow-lg hover:scale-105 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center focus-visible:ring-2 ring-brand-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+
+        <!-- Next arrow -->
+        <button (click)="nextModal()" aria-label="Next item"
+                class="absolute right-4 md:right-8 w-11 h-11 rounded-full bg-white/90 text-gray-900 shadow-lg hover:scale-105 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-center focus-visible:ring-2 ring-brand-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+        </button>
+
+        <!-- Media -->
+        <ng-container *ngIf="modalItem?.type === 'photo'; else videoModal">
+          <img [src]="modalItem?.url" [alt]="'Photo ' + (modalIndex + 1) + ' of ' + galleryAll.length"
+               class="max-h-[85vh] max-w-[90vw] object-contain rounded-2xl shadow-2xl motion-safe:transition-opacity motion-safe:transition-transform duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none" [class.opacity-0]="modalTransitioning" [class.scale-95]="modalTransitioning" style="will-change: opacity, transform" loading="eager" decoding="async">
+        </ng-container>
+        <ng-template #videoModal>
+          <video [src]="modalItem?.url" [attr.poster]="modalItem?.poster || heroPosterUrl" controls playsinline
+                 class="max-h-[85vh] max-w-[90vw] rounded-2xl shadow-2xl bg-black object-contain motion-safe:transition-opacity motion-safe:transition-transform duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none" [class.opacity-0]="modalTransitioning" [class.scale-95]="modalTransitioning" style="will-change: opacity, transform">
+          </video>
+        </ng-template>
+
+        <!-- Indicators -->
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+          <button *ngFor="let _ of galleryAll; let di = index" (click)="goToModal(di)"
+                  class="w-2.5 h-2.5 rounded-full ring-1 ring-white/30 bg-white/40 hover:bg-white motion-safe:transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none"
+                  [class.bg-white]="di === modalIndex" [class.scale-110]="di === modalIndex" [attr.aria-label]="'Go to item ' + (di + 1)" [attr.aria-current]="di === modalIndex ? 'true' : null"></button>
         </div>
       </div>
     </div>

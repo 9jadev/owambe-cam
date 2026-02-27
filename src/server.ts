@@ -27,6 +27,73 @@ const angularApp = new AngularNodeAppEngine();
  */
 
 /**
+ * API: Album Hero Image
+ * Serves a hero image for a given album slug by fetching the event media
+ * from the upstream API and selecting the first valid image.
+ *
+ * Response shape:
+ * {
+ *   slug: string,
+ *   url: string,
+ *   alt: string,
+ *   width?: number,
+ *   height?: number,
+ *   thumbnail_url?: string
+ * }
+ */
+app.get('/api/album/:slug/hero', async (req, res) => {
+  const slug = String(req.params.slug || '').trim();
+  if (!slug) {
+    return res.status(400).json({ error: 'Missing album slug' });
+  }
+
+  // Helper: check if media item is an image
+  const isImage = (item: any): boolean => {
+    const rt = String(item?.resource_type || '').toLowerCase();
+    const fmt = String(item?.format || '').toLowerCase();
+    const url: string | undefined = item?.url || item?.secure_url;
+    const looksLikeImage = (u?: string) => !!u && /(\.jpg|\.jpeg|\.png)(\?.*)?$/i.test(u);
+    return rt === 'image' || fmt === 'jpg' || fmt === 'jpeg' || fmt === 'png' || looksLikeImage(url);
+  };
+
+  try {
+    const upstream = `http://127.0.0.1:8000/api/events/${encodeURIComponent(slug)}/media?page=1&per_page=20`;
+    const resp = await fetch(upstream, { headers: { Accept: 'application/json' } });
+    if (!resp.ok) {
+      const status = resp.status;
+      return res.status(status === 404 ? 404 : 502).json({ error: 'Upstream API error', status });
+    }
+    const raw = await resp.json().catch(() => null);
+    if (!raw || typeof raw !== 'object') {
+      return res.status(422).json({ error: 'Corrupted upstream data' });
+    }
+    const media: any[] = (Array.isArray((raw as any).media) ? (raw as any).media
+      : Array.isArray((raw as any).data?.media) ? (raw as any).data.media : []);
+
+    const hero = media.find(isImage);
+    if (!hero) {
+      return res.status(404).json({ error: 'No hero image found for album', slug });
+    }
+
+    const url: string = (hero.url || hero.secure_url) as string;
+    const payload = {
+      slug,
+      url,
+      alt: `${slug} album hero image`,
+      width: hero.width || undefined,
+      height: hero.height || undefined,
+      thumbnail_url: hero.thumbnail_url || undefined
+    };
+
+    // Basic caching headers for performance
+    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
+    return res.json(payload);
+  } catch (err) {
+    return res.status(500).json({ error: 'Internal server error', detail: (err as Error)?.message || String(err) });
+  }
+});
+
+/**
  * Serve static files from /browser
  */
 app.use(

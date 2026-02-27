@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Component, ElementRef, inject, PLATFORM_ID, ViewChild, OnInit, AfterViewInit } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { EventsHttpService } from '../services/events-http.service';
 
 @Component({
   standalone: true,
@@ -15,6 +16,8 @@ export class CameraComponent implements OnInit, AfterViewInit {
   private platformId = inject(PLATFORM_ID);
   isBrowser = isPlatformBrowser(this.platformId);
 
+  constructor(private route: ActivatedRoute, private router: Router, private eventsApi: EventsHttpService) {}
+
   @ViewChild('videoEl') videoEl?: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasEl') canvasEl?: ElementRef<HTMLCanvasElement>;
 
@@ -24,6 +27,8 @@ export class CameraComponent implements OnInit, AfterViewInit {
   isRecording = false;
   permissionError = '';
   infoMessage = '';
+  uploading = false;
+  slug = '';
 
   // Camera options
   facingMode: 'user' | 'environment' = 'environment';
@@ -42,6 +47,9 @@ export class CameraComponent implements OnInit, AfterViewInit {
     if (!this.isBrowser) {
       this.infoMessage = 'Camera is unavailable during server rendering.';
     }
+
+    // Read slug from query params (e.g., /camera?slug=nkjm)
+    this.slug = this.route.snapshot.queryParamMap.get('slug') || '';
   }
 
   async ngAfterViewInit() {
@@ -133,7 +141,12 @@ export class CameraComponent implements OnInit, AfterViewInit {
 
     canvas.toBlob((blob) => {
       if (!blob) return;
-      this.downloadBlob(blob, `photo-${Date.now()}.png`);
+      // If slug is present, upload to backend album; otherwise, download locally
+      if (this.slug) {
+        this.uploadCapturedBlob(blob);
+      } else {
+        this.downloadBlob(blob, `photo-${Date.now()}.png`);
+      }
     }, 'image/png', 0.95);
   }
 
@@ -221,5 +234,31 @@ export class CameraComponent implements OnInit, AfterViewInit {
   ngOnDestroy() {
     this.stopRecording();
     this.stopCamera();
+  }
+
+  private uploadCapturedBlob(blob: Blob) {
+    if (!this.slug) {
+      this.infoMessage = 'Missing album slug; saving photo locally.';
+      this.downloadBlob(blob, `photo-${Date.now()}.png`);
+      return;
+    }
+
+    const file = new File([blob], `photo-${Date.now()}.png`, { type: 'image/png' });
+    this.uploading = true;
+    this.infoMessage = 'Uploading photo to album...';
+
+    this.eventsApi.uploadMedia(this.slug, [file], 'Guest', 'photo').subscribe({
+      next: (res) => {
+        this.uploading = false;
+        this.infoMessage = res.message || 'Upload successful. Redirecting...';
+        // Navigate back to add-to-album page for this slug
+        this.router.navigate(['/add-to-album', this.slug]);
+      },
+      error: (err) => {
+        console.error('Upload error:', err);
+        this.uploading = false;
+        this.infoMessage = 'Failed to upload photo. Please try again.';
+      }
+    });
   }
 }

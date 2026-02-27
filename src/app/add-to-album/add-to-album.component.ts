@@ -136,44 +136,57 @@ export class AddToAlbumComponent implements OnInit {
             return;
         }
 
+        const imageFiles = this.selectedFiles.filter(f => f.type.startsWith('image'));
+        const videoFiles = this.selectedFiles.filter(f => f.type.startsWith('video'));
+
         this.uploading = true;
         this.uploadProgress = 0;
 
-        // Determine media type from first file
-        const firstFile = this.selectedFiles[0];
-        const mediaType = firstFile.type.startsWith('video') ? 'video' : 'photo';
-
-        // Upload files to API
-        this.eventsApi.uploadMedia(
-            this.slug,
-            this.selectedFiles,
-            undefined, // No author for gallery uploads (authenticated user)
-            mediaType
-        ).subscribe({
-            next: (response) => {
-                console.log('Media uploaded:', response);
-                this.uploadProgress = 100;
-                setTimeout(() => {
-                    this.uploading = false;
-                    this.router.navigate(['/album', this.slug]);
-                }, 500);
-            },
-            error: (error) => {
-                console.error('Failed to upload media:', error);
-                this.uploading = false;
-                this.uploadProgress = 0;
-                // Error is already shown by toast service
-            }
-        });
-
-        // Simulate progress for better UX (since actual upload happens via observable)
+        // Simulate progress for better UX; reach ~90% during upload(s), then 100% on completion
         const progressInterval = setInterval(() => {
             if (this.uploadProgress < 90 && this.uploading) {
                 this.uploadProgress += 5;
-            } else {
-                clearInterval(progressInterval);
             }
         }, 200);
+
+        const finalize = () => {
+            this.uploadProgress = 100;
+            setTimeout(() => {
+                this.uploading = false;
+                clearInterval(progressInterval);
+                this.router.navigate(['/album', this.slug]);
+            }, 500);
+        };
+
+        const handleError = (error: any) => {
+            console.error('Failed to upload media:', error);
+            this.uploading = false;
+            this.uploadProgress = 0;
+            clearInterval(progressInterval);
+            // Error is already shown by toast service
+        };
+
+        // Upload images first (if any), then videos (if any), sequentially
+        const uploadImages = () => new Promise<void>((resolve, reject) => {
+            if (imageFiles.length === 0) return resolve();
+            this.eventsApi.uploadMedia(this.slug, imageFiles, undefined, 'photo').subscribe({
+                next: () => resolve(),
+                error: (err) => reject(err)
+            });
+        });
+
+        const uploadVideos = () => new Promise<void>((resolve, reject) => {
+            if (videoFiles.length === 0) return resolve();
+            this.eventsApi.uploadMedia(this.slug, videoFiles, undefined, 'video').subscribe({
+                next: () => resolve(),
+                error: (err) => reject(err)
+            });
+        });
+
+        uploadImages()
+            .then(() => uploadVideos())
+            .then(() => finalize())
+            .catch((err) => handleError(err));
     }
 
     private resetForm() {
